@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Convolution.vcxproj" Id="fed91d20-1c8a-4fcc-988f-5070179991ed" />
+</Solution>

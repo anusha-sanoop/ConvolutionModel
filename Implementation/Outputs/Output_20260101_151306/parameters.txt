@@ -1,0 +1,16 @@
+Inverse Modeling Parameters - 20260101_151306
+==================================================
+
+Input File 1: D:\Marine\Project\Synthetic Data\Convolution\Test data_DRK\Test data_DRK\Large and small mount\MarsModel3TwoMountainsFar_1Topo_S20km.grd
+Input File 2: D:\Marine\Project\Synthetic Data\Convolution\Test data_DRK\Test data_DRK\Large and small mount\Mohod_depth_add30km_final_S20km.grd
+
+Parameters:
+  Te range: 5.0 - 50.0 km
+  Te step: 1.0 km
+  Crustal density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Gravity: 3.72 m/s²
+  Young's modulus: 70.0 GPa
+  Poisson's ratio: 0.25
+  Window size: 1000.0 km
+  Shift values: [20.0, 30.0, 40.0] km
