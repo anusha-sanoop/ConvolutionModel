@@ -58,8 +58,8 @@ class MovingWindowAnalysis:
         window_size=1000000,
         shift_distance=20000,
         Te_range=(5000, 80000),
-        min_std_topo=100,
-        min_std_moho=100,
+        min_std_topo=0,
+        min_std_moho=0,
     ):
         """
         Perform moving window analysis
@@ -77,9 +77,9 @@ class MovingWindowAnalysis:
         Te_range : tuple
             Range of Te values to search (m)
         min_std_topo : float
-            Minimum standard deviation in topography for valid window
+            Minimum standard deviation in topography for valid window (default 0 = all windows)
         min_std_moho : float
-            Minimum standard deviation in Moho for valid window
+            Minimum standard deviation in Moho for valid window (default 0 = all windows)
 
         Returns:
         --------
@@ -124,6 +124,12 @@ class MovingWindowAnalysis:
         print(
             f"  Te search range: {Te_range[0] / 1000:.0f}-{Te_range[1] / 1000:.0f} km"
         )
+        if min_std_topo <= 0 and min_std_moho <= 0:
+            print("  Min std: 0 (estimating Te in all windows, including flat regions)")
+        else:
+            print(
+                f"  Min std: topo > {min_std_topo} m, moho > {min_std_moho} m (windows below skipped)"
+            )
 
         # Initialize result arrays
         Te_map = np.full((len(y_positions), len(x_positions)), np.nan)
@@ -258,8 +264,8 @@ class MovingWindowAnalysis:
         shift_max=80000,
         shift_step=20000,
         Te_range=(5000, 80000),
-        min_std_topo=100,
-        min_std_moho=100,
+        min_std_topo=0,
+        min_std_moho=0,
     ):
         """
         Perform moving window analysis with multiple shift distances
@@ -281,9 +287,9 @@ class MovingWindowAnalysis:
         Te_range : tuple
             Range of Te values to search (m)
         min_std_topo : float
-            Minimum standard deviation in topography for valid window
+            Minimum standard deviation in topography for valid window (default 0 = all windows)
         min_std_moho : float
-            Minimum standard deviation in Moho for valid window
+            Minimum standard deviation in Moho for valid window (default 0 = all windows)
 
         Returns:
         --------

@@ -82,10 +82,6 @@ def read_surfer_grd(filepath):
         return X, Y, data, dx, dy, nx, ny, xmin, xmax, ymin, ymax
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e164d71a87412ccae8297068cbd15b9f29754aad
 # Surfer no-data value (used when writing NaN so Surfer can blank cells)
 SURFER_BLANK = 1.70141e38
 
@@ -93,26 +89,10 @@ SURFER_BLANK = 1.70141e38
 def write_surfer_grd(filepath, X, Y, data, blank_nan=True):
     """
     Write a 2D grid to a Surfer ASCII grid file (.grd) in DSAA format.
-<<<<<<< HEAD
-=======
-def write_surfer_grd(filepath, X, Y, Z):
-    """
-    Write Surfer ASCII grid file (.grd) in DSAA format.
-
-    This is the inverse of ``read_surfer_grd``: given coordinate grids and
-    a data array, it writes a Surfer-compatible grid that can be opened
-    directly in Surfer.
->>>>>>> 69b31907007356e855bab83a2874f094bcbfd1ec
-=======
->>>>>>> e164d71a87412ccae8297068cbd15b9f29754aad
 
     Parameters
     ----------
     filepath : str
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e164d71a87412ccae8297068cbd15b9f29754aad
         Path to the output .grd file.
     X : 2D array or 1D array
         X coordinates. If 2D (from meshgrid), first row is used; if 1D, used as-is.
@@ -154,75 +134,6 @@ def write_surfer_grd(filepath, X, Y, Z):
         for i in range(ny):
             line = " ".join(f"{z[i, j]:.6g}" for j in range(nx))
             f.write(line + "\n")
-<<<<<<< HEAD
-=======
-        Output .grd file path.
-    X, Y : 1D or 2D arrays
-        Coordinate grids (or coordinate vectors). Must define the same
-        rectangular grid as ``Z``.
-    Z : 2D array
-        Data values on the grid.
-    """
-    Z = np.asarray(Z, dtype=float)
-    if Z.ndim != 2:
-        raise ValueError("Z must be a 2D array")
-
-    ny, nx = Z.shape
-
-    # Handle X, Y as either 1D vectors or 2D grids
-    X = np.asarray(X)
-    Y = np.asarray(Y)
-
-    if X.ndim == 2:
-        x_vec = X[0, :]
-    elif X.ndim == 1:
-        if X.size != nx:
-            raise ValueError(f"X length ({X.size}) does not match Z.shape[1] ({nx})")
-        x_vec = X
-    else:
-        raise ValueError("X must be 1D or 2D")
-
-    if Y.ndim == 2:
-        y_vec = Y[:, 0]
-    elif Y.ndim == 1:
-        if Y.size != ny:
-            raise ValueError(f"Y length ({Y.size}) does not match Z.shape[0] ({ny})")
-        y_vec = Y
-    else:
-        raise ValueError("Y must be 1D or 2D")
-
-    xmin, xmax = float(x_vec[0]), float(x_vec[-1])
-    ymin, ymax = float(y_vec[0]), float(y_vec[-1])
-
-    # Compute z-range from finite values only
-    valid = np.isfinite(Z)
-    if np.any(valid):
-        zlo = float(np.nanmin(Z[valid]))
-        zhi = float(np.nanmax(Z[valid]))
-    else:
-        zlo = 0.0
-        zhi = 0.0
-
-    # Replace non-finite values with a Surfer-style NODATA value
-    nodata = -9999.0
-    Z_to_write = Z.copy()
-    Z_to_write[~valid] = nodata
-
-    with open(filepath, "w") as f:
-        # DSAA header
-        f.write("DSAA\n")
-        f.write(f"{nx} {ny}\n")
-        f.write(f"{xmin:.6f} {xmax:.6f}\n")
-        f.write(f"{ymin:.6f} {ymax:.6f}\n")
-        f.write(f"{zlo:.6f} {zhi:.6f}\n")
-
-        # Data rows, starting from y = ymin (first row)
-        for j in range(ny):
-            row = " ".join(f"{val:.6e}" for val in Z_to_write[j, :])
-            f.write(row + "\n")
->>>>>>> 69b31907007356e855bab83a2874f094bcbfd1ec
-=======
->>>>>>> e164d71a87412ccae8297068cbd15b9f29754aad
 
 
 def check_grid_compatibility(X1, Y1, X2, Y2):
