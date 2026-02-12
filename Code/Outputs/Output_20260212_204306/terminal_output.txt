@@ -1,0 +1,61 @@
+
+Logging terminal output.
+  Log file: D:\Marine\Project\Te\Code\Output_20260212_204306\terminal_output.txt
+
+Loading grids.
+Warning: Grid dimensions don't match: (201, 181) vs (165, 165)
+Proceeding anyway.
+
+Predicting Moho from gravity.
+  Using user-provided reference Moho: 30.0 km
+
+Gravity Moho Inverter Initialized:
+  Density contrast: 600.0 kg/m³
+  Reference Moho depth: 30.0 km
+  Gravitational constant: None m³/kg/s²
+  Converged after 2 iterations (max change: 0.00 m)
+Moho prediction complete.
+  Moho depth range: -55061.7 to -13663.2 m
+
+Preparing data for inversion.
+  Using user-provided reference Moho: 30.0 km (30000.0 m)
+
+Filename prefix: 2.9_30_1000_
+
+Data Statistics:
+  Topography mean: -707.4 m
+  Topography std (original): 3031.0 m
+  Topography std (anomaly): 2835.7 m
+  Moho mean depth: 30000.0 m
+  Moho std (original): 4276.4 m
+  Moho undulation std: 16765.0 m
+  Taper applied: True
+
+Physical parameters (Mars).
+  Crustal density (ρ_crust): 2900.0 kg/m³
+  Mantle density (ρ_mantle): 3500.0 kg/m³
+  Density contrast (Δρ): 600.0 kg/m³
+  Gravity (g): 3.72 m/s²
+  Young's modulus (E): 1.0e+11 Pa
+  Poisson's ratio (ν): 0.25
+
+Quick diagnostic check.
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+
+ DIAGNOSTIC CHECK 
+Topography std: 2835.7 m
+Moho undulation std: 16765.0 m
+Expected Airy compensation: 13705.7 m
+Actual/Expected ratio: 1.223
+Compensation: 122.3% of Airy
+→ Suggests weak/thin lithosphere (low Te)
+
+

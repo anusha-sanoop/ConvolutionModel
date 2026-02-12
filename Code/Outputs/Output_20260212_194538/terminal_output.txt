@@ -1,0 +1,14 @@
+
+Logging terminal output.
+  Log file: D:\Marine\Project\Te\Code\Output_20260212_194538\terminal_output.txt
+
+Loading grids.
+Warning: Grid dimensions don't match: (201, 181) vs (165, 165)
+Proceeding anyway.
+
+Predicting Moho from gravity.
+  Using user-provided reference Moho: 30.0 km
+
+Gravity Moho Inverter Initialized:
+  Density contrast: 600.0 kg/m³
+  Reference Moho depth: 30.0 km

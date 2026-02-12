@@ -1,0 +1,16 @@
+
+Logging terminal output.
+  Log file: D:\Marine\Project\Te\Code\Output_20260212_200932\terminal_output.txt
+
+Loading grids.
+Warning: Grid dimensions don't match: (201, 181) vs (165, 165)
+Proceeding anyway.
+  Resampling Bouguer gravity from shape (165, 165) to match topography shape (201, 181).
+  Resampling complete; gravity grid now matches topography grid.
+
+Predicting Moho from gravity.
+  Using user-provided reference Moho: 30.0 km
+
+Gravity Moho Inverter Initialized:
+  Density contrast: 600.0 kg/m³
+  Reference Moho depth: 30.0 km
