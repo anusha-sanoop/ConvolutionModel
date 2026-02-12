@@ -1,0 +1,318 @@
+
+
+ TERMINAL OUTPUT LOGGING ENABLED
+All output is being saved to: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\terminal_output.txt
+
+
+
+
+ LOADING DATA
+Loaded Test data_DRK\Large and small mount\MarsModel3TwoMountainsFar_1Topo_S20km.grd:
+  Grid size: 511 x 251
+  X range: -5100.0 to 5100.0 km
+  Y range: -2500.0 to 2500.0 km
+  Grid spacing: 20.00 x 20.00 km
+  Data range: -0.00 to 20000.00
+  Data mean: 43.46, std: 807.19
+Loaded D:\PhD\Marine\Code\Synthetic\Convolution\Test data_DRK\Large and small mount\Mohod_depth_add30km_final_S20km.grd:
+  Grid size: 511 x 251
+  X range: -5100.0 to 5100.0 km
+  Y range: -2500.0 to 2500.0 km
+  Grid spacing: 20.00 x 20.00 km
+  Data range: -81047.00 to -30001.00
+  Data mean: -30318.69, std: 2449.36
+
+ Grids are compatible
+
+
+ PREPARING DATA FOR INVERSION
+  Using user-provided reference Moho: 30.0 km (30000.0 m)
+
+ Initial filename prefix: 2.9_30_1000_
+
+Data Statistics:
+  Topography mean: 43.5 m
+  Topography std (original): 807.2 m
+  Topography std (anomaly): 807.0 m
+  Moho mean depth: 30000.0 m
+  Moho std (original): 2449.4 m
+  Moho undulation std: 16040.2 m
+  Taper applied: True
+
+
+ PHYSICAL PARAMETERS (MARS)
+  Crustal density (ρ_crust): 2900.0 kg/m³
+  Mantle density (ρ_mantle): 3500.0 kg/m³
+  Density contrast (Δρ): 600.0 kg/m³
+  Gravity (g): 3.72 m/s²
+  Young's modulus (E): 1.0e+11 Pa
+  Poisson's ratio (ν): 0.25
+
+
+ DIAGNOSTIC CHECK
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+
+ DIAGNOSTIC CHECK 
+Topography std: 807.0 m
+Moho undulation std: 16040.2 m
+Expected Airy compensation: 3900.6 m
+Actual/Expected ratio: 4.112
+Compensation: 411.2% of Airy
+→ Suggests weak/thin lithosphere (low Te)
+
+
+
+=== SIGN CONVENTION CHECK ===
+Topo-Moho correlation: -0.138
+At max |topo| (19956.5 m):
+  Moho undulation: -110795.0 m
+   Positive topo, Negative Moho deflection
+   This means: Mountain  Moho goes DOWN (deeper)
+   Sign convention is CORRECT
+
+
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_topography_moho_combined_3d.png
+
+
+ WINDOW ANALYSIS
+Press 1 for single window, 2 for moving window: 
+ Performing moving window analysis using observed Moho
+  (Will estimate Te by comparing observed vs flexure-predicted Moho)
+
+
+ MOVING WINDOW ANALYSIS
+Window size (km) [default 1000]: Minimum shift (km) [default 20]: Maximum shift (km) [default 80]: Shift step (km) [default 20]: Minimum Te (km) [default 5]: Maximum Te (km) [default 80]: 
+ Analysis Parameters:
+  Window size: 1000 km
+  Shift range: 20-80 km (step 20 km)
+  Te search range: 1-140 km
+
+ Updated filename prefix with window size: 2.9_30_1000_
+
+Moving Window Analyzer Initialized:
+  Using density parameters: ρ_load=2900.0, ρ_m=3500.0, ρ_infill=2900.0
+
+============================================================
+Analyzing with shift distance: 20 km
+============================================================
+
+Moving Window Analysis:
+  Window size: 1000 km (50 pixels)
+  Shift distance: 20 km (1 pixels)
+  Number of windows: 92661 (461 x 201)
+  Te search range: 1-140 km
+  Min std: 0 (estimating Te in all windows, including flat regions)
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+    Progress: 10.0% (9266/92661) - 29.9s
+    Progress: 20.0% (18532/92661) - 34.9s
+    Progress: 30.0% (27798/92661) - 40.2s
+    Progress: 40.0% (37064/92661) - 54.8s
+    Progress: 50.0% (46330/92661) - 68.9s
+    Progress: 60.0% (55596/92661) - 82.9s
+    Progress: 70.0% (64862/92661) - 98.0s
+    Progress: 80.0% (74128/92661) - 104.1s
+    Progress: 90.0% (83394/92661) - 109.0s
+    Progress: 100.0% (92660/92661) - 137.3s
+
+  Results: 32922 valid windows (35.5%)
+    Te range: 1.0 - 140.0 km
+    Te mean: 104.2 ± 53.2 km
+    Te median: 140.0 km
+
+    WARNING: 65.2% of windows at UPPER bound!
+     True Te likely > 140 km
+     → Increase maximum Te in search range
+
+============================================================
+Analyzing with shift distance: 40 km
+============================================================
+
+Moving Window Analysis:
+  Window size: 1000 km (50 pixels)
+  Shift distance: 40 km (2 pixels)
+  Number of windows: 23331 (231 x 101)
+  Te search range: 1-140 km
+  Min std: 0 (estimating Te in all windows, including flat regions)
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+    Progress: 10.0% (2333/23331) - 8.1s
+    Progress: 20.0% (4666/23331) - 9.4s
+    Progress: 30.0% (6999/23331) - 10.7s
+    Progress: 40.0% (9332/23331) - 14.5s
+    Progress: 50.0% (11665/23331) - 18.2s
+    Progress: 60.0% (13998/23331) - 21.8s
+    Progress: 70.0% (16331/23331) - 25.7s
+    Progress: 80.0% (18664/23331) - 27.1s
+    Progress: 90.0% (20997/23331) - 28.4s
+    Progress: 100.0% (23330/23331) - 35.7s
+
+  Results: 8384 valid windows (35.9%)
+    Te range: 1.0 - 140.0 km
+    Te mean: 105.2 ± 52.7 km
+    Te median: 140.0 km
+
+    WARNING: 65.9% of windows at UPPER bound!
+     True Te likely > 140 km
+     → Increase maximum Te in search range
+
+============================================================
+Analyzing with shift distance: 60 km
+============================================================
+
+Moving Window Analysis:
+  Window size: 1000 km (50 pixels)
+  Shift distance: 60 km (3 pixels)
+  Number of windows: 10318 (154 x 67)
+  Te search range: 1-140 km
+  Min std: 0 (estimating Te in all windows, including flat regions)
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+    Progress: 10.0% (1031/10318) - 3.8s
+    Progress: 20.0% (2062/10318) - 4.3s
+    Progress: 30.0% (3093/10318) - 4.9s
+    Progress: 40.0% (4124/10318) - 6.6s
+    Progress: 50.0% (5155/10318) - 8.2s
+    Progress: 60.0% (6186/10318) - 9.8s
+    Progress: 69.9% (7217/10318) - 11.5s
+    Progress: 79.9% (8248/10318) - 12.2s
+    Progress: 89.9% (9279/10318) - 12.8s
+    Progress: 99.9% (10310/10318) - 15.9s
+
+  Results: 3745 valid windows (36.3%)
+    Te range: 1.0 - 140.0 km
+    Te mean: 105.3 ± 52.7 km
+    Te median: 140.0 km
+
+    WARNING: 66.1% of windows at UPPER bound!
+     True Te likely > 140 km
+     → Increase maximum Te in search range
+
+============================================================
+Analyzing with shift distance: 80 km
+============================================================
+
+Moving Window Analysis:
+  Window size: 1000 km (50 pixels)
+  Shift distance: 80 km (4 pixels)
+  Number of windows: 5916 (116 x 51)
+  Te search range: 1-140 km
+  Min std: 0 (estimating Te in all windows, including flat regions)
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+    Progress: 10.0% (591/5916) - 2.3s
+    Progress: 20.0% (1182/5916) - 2.6s
+    Progress: 30.0% (1773/5916) - 3.0s
+    Progress: 40.0% (2364/5916) - 4.0s
+    Progress: 49.9% (2955/5916) - 5.0s
+    Progress: 59.9% (3546/5916) - 5.9s
+    Progress: 69.9% (4137/5916) - 6.9s
+    Progress: 79.9% (4728/5916) - 7.3s
+    Progress: 89.9% (5319/5916) - 7.6s
+    Progress: 99.9% (5910/5916) - 9.4s
+
+  Results: 2202 valid windows (37.2%)
+    Te range: 1.0 - 140.0 km
+    Te mean: 106.5 ± 52.3 km
+    Te median: 140.0 km
+
+    WARNING: 67.5% of windows at UPPER bound!
+     True Te likely > 140 km
+     → Increase maximum Te in search range
+
+
+ CREATING TE MAPS
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_20km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_20km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_40km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_40km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_60km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_60km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_80km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_80km_3d.png
+
+
+ CREATING RMS MAPS
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_20km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_20km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_40km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_40km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_60km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_60km_3d.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_80km.png
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_80km_3d.png
+
+
+ SAVING DATA
+
+ Exporting key grids to Surfer (.grd) format...
+ Writing Surfer .grd files...
+ Surfer .grd files saved.
+
+
+ PLOTTING FINAL RESULTS
+
+ Results saved to: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401
+  - inversion_results.npz
+  - Surfer .grd: topography, topography_anomaly, moho_depth, moho_undulation (+ Te/rms maps per shift)
+
+ OUTPUT FIGURES (saved as PNG):
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_input_data.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D  (3D topography+Moho)
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_20km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_20km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_20km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_20km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_40km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_40km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_40km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_40km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_60km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_60km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_60km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_60km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_te_map_shift_80km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\2.9_30_1000_rms_map_shift_80km.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_te_map_shift_80km_3d.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401\3D\2.9_30_1000_rms_map_shift_80km_3d.png
+
+
+ ANALYSIS COMPLETE
+
+All outputs saved in: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260211_114401

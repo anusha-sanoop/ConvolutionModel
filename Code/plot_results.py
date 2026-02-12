@@ -50,7 +50,6 @@ def load_results(npz_path):
     # Use the first available shift
     shift_km = sorted(te_maps.keys())[0]
     te_map = te_maps[shift_km]
-    print(f"Using Te map from shift = {shift_km} km")
     
     # Reconstruct center coordinates (for backward compatibility)
     ny_te, nx_te = te_map.shape
@@ -125,21 +124,16 @@ def plot_input_output_comparison(
     te_interp = interpolate_te_to_full_grid(te_map, te_x_centers, te_y_centers, X_full, Y_full)
     
     # Calculate predicted and residual Moho
-    print("  Calculating predicted Moho using mean Te...")
     inverter = ElasticThicknessInversion(
         dx=dx, dy=dy, rho_load=RHO_LOAD, rho_m=RHO_MANTLE, rho_infill=0, g=GRAVITY
     )
     te_mean = np.nanmean(te_interp)
-    print(f"  Mean Te: {te_mean/1000:.1f} km")
     
     # Use topography anomaly for prediction (as done in inversion)
     moho_pred = inverter.predict_moho_flexure(topo_anom, te_mean)
     
     # Residual = observed moho_undulation - predicted moho_undulation
     residual_moho = moho_undulation - moho_pred
-    
-    print(f"  Residual Moho range: {residual_moho.min():.1f} to {residual_moho.max():.1f} m")
-    print(f"  Residual Moho RMS: {np.sqrt(np.mean(residual_moho**2)):.1f} m")
     
     # Create figure
     fig, axes = plt.subplots(2, 2, figsize=(16, 14))
@@ -196,7 +190,6 @@ def plot_input_output_comparison(
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    print(f" Saved: {output_path}")
     plt.show()
     
     return fig
@@ -215,8 +208,6 @@ def main():
     if not os.path.exists(npz_path):
         print(f" Error: {npz_path} not found!")
         return
-    
-    print(f"\nLoading data from: {npz_path}")
     data = load_results(npz_path)
     
     # Get Te map coordinates
@@ -232,9 +223,6 @@ def main():
     y_m = Y[:, 0]
     dx = x_m[1] - x_m[0] if len(x_m) > 1 else 1000
     dy = y_m[1] - y_m[0] if len(y_m) > 1 else 1000
-    
-    # Calculate residual Moho
-    print("\nCalculating predicted and residual Moho...")
     
     # Create plot
     output_path = os.path.join(output_folder, "input_output_comparison.png")
@@ -252,8 +240,6 @@ def main():
         dx,
         dy
     )
-    
-    print(f"\n Complete! Results saved to: {output_path}")
 
 
 if __name__ == "__main__":

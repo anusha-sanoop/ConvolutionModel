@@ -67,19 +67,11 @@ def read_surfer_grd(filepath):
         y = np.linspace(ymin, ymax, ny)
         X, Y = np.meshgrid(x, y)
 
-        # Calculate grid spacing
-        dx = (xmax - xmin) / (nx - 1) if nx > 1 else 0
-        dy = (ymax - ymin) / (ny - 1) if ny > 1 else 0
+    # Calculate grid spacing
+    dx = (xmax - xmin) / (nx - 1) if nx > 1 else 0
+    dy = (ymax - ymin) / (ny - 1) if ny > 1 else 0
 
-        print(f"Loaded {filepath}:")
-        print(f"  Grid size: {nx} x {ny}")
-        print(f"  X range: {xmin / 1000:.1f} to {xmax / 1000:.1f} km")
-        print(f"  Y range: {ymin / 1000:.1f} to {ymax / 1000:.1f} km")
-        print(f"  Grid spacing: {dx / 1000:.2f} x {dy / 1000:.2f} km")
-        print(f"  Data range: {np.min(data):.2f} to {np.max(data):.2f}")
-        print(f"  Data mean: {np.mean(data):.2f}, std: {np.std(data):.2f}")
-
-        return X, Y, data, dx, dy, nx, ny, xmin, xmax, ymin, ymax
+    return X, Y, data, dx, dy, nx, ny, xmin, xmax, ymin, ymax
 
 
 # Surfer no-data value (used when writing NaN so Surfer can blank cells)

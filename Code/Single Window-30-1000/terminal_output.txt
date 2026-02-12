@@ -1,0 +1,118 @@
+
+Logging terminal output.
+  Log file: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\terminal_output.txt
+
+Loading grids.
+Loaded D:\PhD\Marine\Test data_DRK\Real data\Topo_proj.grd:
+  Grid size: 181 x 201
+  X range: -5400.0 to 5400.0 km
+  Y range: -6000.0 to 6000.0 km
+  Grid spacing: 60.00 x 60.00 km
+  Data range: -6404.39 to 20389.20
+  Data mean: -707.45, std: 3031.02
+Loaded D:\PhD\Marine\Test data_DRK\Real data\Moho_Tc+Topo.grd:
+  Grid size: 181 x 201
+  X range: -5400.0 to 5400.0 km
+  Y range: -6000.0 to 6000.0 km
+  Grid spacing: 60.00 x 60.00 km
+  Data range: -82227.45 to -14740.98
+  Data mean: -44198.48, std: 14979.54
+Grids are compatible
+
+Preparing data for inversion.
+  Using user-provided reference Moho: 30.0 km (30000.0 m)
+
+Filename prefix: 2.9_30_1000_
+
+Data Statistics:
+  Topography mean: -707.4 m
+  Topography std (original): 3031.0 m
+  Topography std (anomaly): 2835.7 m
+  Moho mean depth: 30000.0 m
+  Moho std (original): 14979.5 m
+  Moho undulation std: 24612.5 m
+  Taper applied: True
+
+Physical parameters (Mars).
+  Crustal density (ρ_crust): 2900.0 kg/m³
+  Mantle density (ρ_mantle): 3500.0 kg/m³
+  Density contrast (Δρ): 600.0 kg/m³
+  Gravity (g): 3.72 m/s²
+  Young's modulus (E): 1.0e+11 Pa
+  Poisson's ratio (ν): 0.25
+
+Quick diagnostic check.
+
+Elastic Thickness Inverter Initialized:
+  Load density: 2900.0 kg/m³
+  Mantle density: 3500.0 kg/m³
+  Infill density: 2900.0 kg/m³
+  Density contrast: 600.0 kg/m³
+  Airy compensation ratio: 4.833
+  Young's modulus: 1.00e+11 Pa
+  Gravity: 3.72 m/s²
+
+ DIAGNOSTIC CHECK 
+Topography std: 2835.7 m
+Moho undulation std: 24612.5 m
+Expected Airy compensation: 13705.7 m
+Actual/Expected ratio: 1.796
+Compensation: 179.6% of Airy
+→ Suggests weak/thin lithosphere (low Te)
+
+
+
+=== SIGN CONVENTION CHECK ===
+Topo-Moho correlation: -0.556
+At max |topo| (21096.6 m):
+  Moho undulation: -63834.7 m
+   Positive topo, Negative Moho deflection
+   This means: Mountain  Moho goes DOWN (deeper)
+   Sign convention is CORRECT
+
+
+ Saved: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\3D\2.9_30_1000_topography_moho_combined_3d.png
+
+Window analysis.
+Press 1 for single window, 2 for moving window: 
+ Single-window analysis using observed Moho
+
+Single-window analysis.
+Window size (km) [default 1000]: Minimum Te (km) [default 5]: Maximum Te (km) [default 80]: 
+  Grid extent: X = -5400.0 to 5400.0 km, Y = -6000.0 to 6000.0 km
+  Window size: 1000 km. Move mouse, then LEFT-CLICK to run Te.
+  Selected window center: (-1854.0, 1106.1) km
+  Te search range: 1-200 km
+  Window: center_-1854_1106km_size_1000km (18 x 17 points)
+  Running Te inversion...
+
+ Single-window result:
+  Te = 118.25 km
+  RMS misfit = 6642.26 m
+
+ Filename prefix: 2.9_30_1000_
+
+Saving outputs.
+ Writing Surfer .grd files...
+ Te map (single window): d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_Te_single_map.png
+ RMS map (single window): d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_rms_single_map.png
+ Surfer .grd files saved.
+  Saved figure: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_single_window_location.png
+  Saved figure: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_single_window_result.png
+
+Plotting final results.
+
+ Results saved to: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526
+  - inversion_results.npz
+  - Surfer .grd: topography, topography_anomaly, moho_depth, moho_undulation, Te_single, rms_single
+  - Single-window: Te = 118.25 km, RMS = 6642.26 m
+
+ OUTPUT FIGURES (saved as PNG):
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_input_data.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_single_window_location.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\2.9_30_1000_single_window_result.png
+  - d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526\3D  (3D topography+Moho)
+
+Analysis complete.
+
+All outputs saved in: d:\PhD\Marine\Code\Synthetic\Convolution\Code\Output_20260212_124526

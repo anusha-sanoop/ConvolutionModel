@@ -46,11 +46,6 @@ class MovingWindowAnalysis:
         self.rho_infill = rho_infill if rho_infill is not None else RHO_INFILL
         self.g = g if g is not None else GRAVITY
 
-        print(f"\nMoving Window Analyzer Initialized:")
-        print(
-            f"  Using density parameters: ρ_load={rho_load}, ρ_m={rho_m}, ρ_infill={rho_infill}"
-        )
-
     def analyze(
         self,
         topography_anom,
@@ -95,12 +90,9 @@ class MovingWindowAnalysis:
         # Ensure minimum values (at least 1 pixel)
         if window_pixels < 1:
             window_pixels = 1
-            print(f"  Warning: Window size too small, using minimum of 1 pixel")
         
         if shift_pixels < 1:
             shift_pixels = 1
-            print(f"  Warning: Shift distance ({shift_distance / 1000:.1f} km) is smaller than grid spacing ({self.dx / 1000:.1f} km)")
-            print(f"           Using minimum shift of 1 pixel ({self.dx / 1000:.1f} km)")
 
         # Ensure window size is reasonable
         if window_pixels >= nx or window_pixels >= ny:
@@ -113,23 +105,6 @@ class MovingWindowAnalysis:
         y_positions = np.arange(0, ny - window_pixels, shift_pixels)
 
         n_windows = len(x_positions) * len(y_positions)
-        print("\nMoving Window Analysis:")
-        print(f"  Window size: {window_size / 1000:.0f} km ({window_pixels} pixels)")
-        print(
-            f"  Shift distance: {shift_distance / 1000:.0f} km ({shift_pixels} pixels)"
-        )
-        print(
-            f"  Number of windows: {n_windows} ({len(x_positions)} x {len(y_positions)})"
-        )
-        print(
-            f"  Te search range: {Te_range[0] / 1000:.0f}-{Te_range[1] / 1000:.0f} km"
-        )
-        if min_std_topo <= 0 and min_std_moho <= 0:
-            print("  Min std: 0 (estimating Te in all windows, including flat regions)")
-        else:
-            print(
-                f"  Min std: topo > {min_std_topo} m, moho > {min_std_moho} m (windows below skipped)"
-            )
 
         # Initialize result arrays
         Te_map = np.full((len(y_positions), len(x_positions)), np.nan)
@@ -185,64 +160,19 @@ class MovingWindowAnalysis:
                         rms_map[i, j] = result["rms_best"]
                         valid_count += 1
 
-                    except Exception as e:
-                        if window_count % 100 == 0:
-                            print(f"    Warning: Window {window_count} failed: {e}")
+                    except Exception:
                         continue
 
                 # Store window center coordinates IN METERS (not pixel indices)
                 x_centers[j] = (x_start + window_pixels // 2) * self.dx
                 y_centers[i] = (y_start + window_pixels // 2) * self.dy
 
-                # Progress update
+                # Progress update (no terminal output; timing kept for potential future use)
                 if window_count % max(1, n_windows // 10) == 0:
-                    elapsed = time.time() - start_time
-                    progress = window_count / n_windows * 100
-                    print(
-                        f"    Progress: {progress:.1f}% ({window_count}/{n_windows}) - {elapsed:.1f}s"
-                    )
+                    _elapsed = time.time() - start_time
 
         # Calculate statistics
         valid_Te = Te_map[~np.isnan(Te_map)]
-        if len(valid_Te) > 0:
-            print(
-                f"\n  Results: {len(valid_Te)} valid windows ({valid_count / n_windows * 100:.1f}%)"
-            )
-            print(
-                f"    Te range: {valid_Te.min() / 1000:.1f} - {valid_Te.max() / 1000:.1f} km"
-            )
-            print(
-                f"    Te mean: {valid_Te.mean() / 1000:.1f} ± {valid_Te.std() / 1000:.1f} km"
-            )
-            print(f"    Te median: {np.median(valid_Te) / 1000:.1f} km")
-
-            # Check if hitting bounds
-            at_lower_bound = (
-                np.sum(np.abs(valid_Te - Te_range[0]) < 100) / len(valid_Te) * 100
-            )
-            at_upper_bound = (
-                np.sum(np.abs(valid_Te - Te_range[1]) < 100) / len(valid_Te) * 100
-            )
-
-            if at_upper_bound > 30:
-                print(
-                    f"\n    WARNING: {at_upper_bound:.1f}% of windows at UPPER bound!"
-                )
-                print(f"     True Te likely > {Te_range[1] / 1000:.0f} km")
-                print(f"     → Increase maximum Te in search range")
-            elif at_lower_bound > 30:
-                print(
-                    f"\n    WARNING: {at_lower_bound:.1f}% of windows at LOWER bound!"
-                )
-                print(f"     True Te likely < {Te_range[0] / 1000:.0f} km")
-                print(f"     → Decrease minimum Te in search range")
-            else:
-                print(f"\n  ✓ Te values well-distributed within search range")
-        else:
-            print("\n  Warning: No valid windows found!")
-            print(
-                "  Try reducing window_size, increasing shift_distance, or checking data quality"
-            )
 
         return {
             "Te_map": Te_map,
@@ -300,10 +230,6 @@ class MovingWindowAnalysis:
         all_results = {}
 
         for shift_dist in shift_distances:
-            print("\n" + "=" * 60)
-            print(f"Analyzing with shift distance: {shift_dist / 1000:.0f} km")
-            print("=" * 60)
-
             result = self.analyze(
                 topography_anom,
                 moho_undulation,

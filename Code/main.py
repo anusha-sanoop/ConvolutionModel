@@ -241,10 +241,6 @@ def plot_input_data_3d(
 
 def main():
     
-    print("\n") 
-    print(" INPUT FILE PATHS..")
-    print("\n") 
-     
     
     # Get topography file path from user
     topography_file = input("\nEnter path to topography file (.grd): ").strip()
@@ -259,13 +255,13 @@ def main():
         gravity_file = input("Enter path to Bouguer gravity file (.grd): ").strip()
         gravity_file = gravity_file.strip('"').strip("'")
         moho_file = None  # Will predict Moho from gravity
-        print(" Will predict Moho from gravity data")
+        print("Moho input: will be predicted from gravity.")
     else:
         # Get Moho depth file path from user
         moho_file = input("Enter path to Moho depth file (.grd): ").strip()
         moho_file = moho_file.strip('"').strip("'")
         gravity_file = None
-        print(" Will use provided Moho depth data")
+        print("Moho input: using provided Moho depth grid.")
     
     # No need for true Te value input
     true_Te = None
@@ -278,39 +274,39 @@ def main():
         try:
             ref_moho_km = float(ref_moho_input)
             ref_moho = ref_moho_km * 1000.0  # Convert km to meters for internal calculations
-            print(f" Using reference Moho depth: {ref_moho_km:.1f} km ({ref_moho:.1f} m)")
+            print(f"Reference Moho depth: {ref_moho_km:.1f} km ({ref_moho:.1f} m).")
         except:
             ref_moho = None
             ref_moho_km = None
-            print(" Invalid input, will use mean Moho depth as reference")
+            print("Reference Moho depth: invalid input; using mean Moho depth.")
     else:
         ref_moho = None
         ref_moho_km = None
-        print(" Will use mean Moho depth as reference")
+        print("Reference Moho depth: using mean Moho depth.")
 
     # Check file existence
-    print(f"\nChecking files...")
-    print(f"  Topography file: {topography_file}")
+    print("\nChecking input files.")
+    print(f"  Topography: {topography_file}")
     
     if not os.path.exists(topography_file):
-        print(f"\n ERROR: Topography file not found!")
-        print(f"   {topography_file}")
+        print("\nError: topography file not found.")
+        print(f"  {topography_file}")
         return
     
     if use_gravity == "y":
-        print(f"  Gravity file: {gravity_file}")
+        print(f"  Gravity: {gravity_file}")
         if not os.path.exists(gravity_file):
-            print(f"\n ERROR: Gravity file not found!")
-            print(f"   {gravity_file}")
+            print("\nError: gravity file not found.")
+            print(f"  {gravity_file}")
             return
-        print(" Both files found!")
+        print("Input files look good.")
     else:
-        print(f"  Moho file: {moho_file}")
+        print(f"  Moho: {moho_file}")
         if not os.path.exists(moho_file):
-            print(f"\n ERROR: Moho file not found!")
-            print(f"   {moho_file}")
+            print("\nError: Moho file not found.")
+            print(f"  {moho_file}")
             return
-        print(" Both files found!")
+        print("Input files look good.")
 
     # Create output folder
     output_folder = create_output_folder()
@@ -321,15 +317,11 @@ def main():
     log_file_path = os.path.join(output_folder, "terminal_output.txt")
     tee = TeeOutput(log_file_path)
     sys.stdout = tee
-    print("\n")
-    print(f" TERMINAL OUTPUT LOGGING ENABLED")
-    
-    print(f"All output is being saved to: {log_file_path}")
-    print("\n")
+    print("\nLogging terminal output.")
+    print(f"  Log file: {log_file_path}\n")
 
     # LOAD DATA
-    print("\n") 
-    print(" LOADING DATA")
+    print("Loading grids.")
      
 
     X_topo, Y_topo, topography, dx, dy, *_ = read_surfer_grd(topography_file)
@@ -341,14 +333,13 @@ def main():
         # Check grid compatibility
         compatible, message = check_grid_compatibility(X_topo, Y_topo, X_grav, Y_grav)
         if not compatible:
-            print(f"\n WARNING: {message}")
-            print("Proceeding with caution...")
+            print(f"Warning: {message}")
+            print("Proceeding anyway.")
         else:
-            print(f"\n {message}")
+            print(message)
         
         # Predict Moho from gravity
-        print("\n") 
-        print(" PREDICTING MOHO FROM GRAVITY")
+        print("\nPredicting Moho from gravity.")
          
         
         # Use user-provided reference Moho, or fallback default if not provided
@@ -365,7 +356,7 @@ def main():
         moho_depth = gravity_inverter.predict_moho_from_gravity(bouguer_gravity)
         X_moho, Y_moho = X_grav, Y_grav
         
-        print(f" Moho predicted from gravity data")
+        print("Moho prediction complete.")
         print(f"  Moho depth range: {moho_depth.min():.1f} to {moho_depth.max():.1f} m")
     else:
         # Load observed Moho data
@@ -374,16 +365,14 @@ def main():
         # Check grid compatibility
         compatible, message = check_grid_compatibility(X_topo, Y_topo, X_moho, Y_moho)
         if not compatible:
-            print(f"\n WARNING: {message}")
-            print("Proceeding with caution...")
+            print(f"Warning: {message}")
+            print("Proceeding anyway.")
         else:
-            print(f"\n {message}")
+            print(message)
 
     # PREPARE DATA
-    print("\n") 
-    print(" PREPARING DATA FOR INVERSION")
+    print("\nPreparing data for inversion.")
      
-
     # Apply taper and remove mean (or user-provided reference)
     if ref_moho is not None:
         # Use user-provided reference Moho
@@ -413,7 +402,7 @@ def main():
     # Use default window size for now (will be updated when window_size is known)
     window_size_km_default = 1000.0  # Default 1000 km
     filename_prefix = create_filename_prefix(RHO_LOAD, ref_moho_km, window_size_km_default)
-    print(f"\n Initial filename prefix: {filename_prefix}")
+    print(f"\nFilename prefix: {filename_prefix}")
 
     print("\nData Statistics:")
     print(f"  Topography mean: {stats['topo_mean']:.1f} m")
@@ -425,8 +414,7 @@ def main():
     print(f"  Taper applied: {stats['tapered']}")
 
     # PHYSICAL PARAMETERS
-    print("\n") 
-    print(" PHYSICAL PARAMETERS (MARS)")
+    print("\nPhysical parameters (Mars).")
      
     print(f"  Crustal density (ρ_crust): {RHO_LOAD} kg/m³")
     print(f"  Mantle density (ρ_mantle): {RHO_MANTLE} kg/m³")
@@ -436,8 +424,7 @@ def main():
     print(f"  Poisson's ratio (ν): {POISSONS_RATIO}")
 
     # DIAGNOSTIC CHECK
-    print("\n") 
-    print(" DIAGNOSTIC CHECK")
+    print("\nQuick diagnostic check.")
      
 
     inverter = ElasticThicknessInversion(
@@ -497,11 +484,10 @@ def main():
     )
 
     # GLOBAL INVERSION
-    # perform_global = input("\nPerform global (full-region) inversion? (y/n): ").lower()
+    # perform_global = input("\nRun a global (full-region) inversion? (y/n): ").lower()
     perform_global = "n"
     if perform_global == "y":
-        print("\n") 
-        print(" GLOBAL INVERSION")
+        print("\nRunning global inversion.")
          
 
         Te_range = (1000, 100000)
@@ -511,7 +497,7 @@ def main():
             topo_anom, moho_undulation, Te_range=Te_range, method="bounded"
         )
 
-        print(f"\n Global Te estimate: {global_result['Te_best'] / 1000:.2f} km")
+        print(f"\nGlobal Te estimate: {global_result['Te_best'] / 1000:.2f} km")
         print(f"  RMS misfit: {global_result['rms_best']:.2f} m")
 
         if true_Te is not None:
@@ -589,8 +575,7 @@ def main():
                 print("\n   Solution may be poorly constrained (shallow RMS minimum)")
 
     # WINDOW ANALYSIS: single window or moving window
-    print("\n") 
-    print(" WINDOW ANALYSIS")
+    print("\nWindow analysis.")
      
     choice = input("Press 1 for single window, 2 for moving window: ").strip()
     if choice == "1":
@@ -607,8 +592,7 @@ def main():
             print("\n Single-window analysis using gravity-predicted Moho")
         else:
             print("\n Single-window analysis using observed Moho")
-        print("\n") 
-        print(" SINGLE WINDOW ANALYSIS")
+        print("\nSingle-window analysis.")
          
 
         x_m = X_topo[0, :]
@@ -738,8 +722,10 @@ def main():
         region_ny, region_nx = j1 - j0, i1 - i0
         region_size_km = window_size_km_sw  # selected region side in km
 
-        # Option: one Te for whole region, or Te map within region
-        single_region_mode = input("Within selected region: (1) One Te for whole region  (2) Te map within region [1]: ").strip() or "1"
+        # Mode for selected region:
+        #   "1" → one Te for whole region (default, no prompt)
+        #   "2" → Te map within region (not used here)
+        single_region_mode = "1"
         single_window_result = None
         single_region_has_map = False
 
@@ -855,8 +841,7 @@ def main():
         print(f"\n Filename prefix: {filename_prefix}")
 
         # SAVE DATA (single window)
-        print("\n") 
-        print(" SAVING DATA")
+        print("\nSaving outputs.")
          
         save_dict = {
             "topography": topography,
@@ -928,6 +913,51 @@ def main():
                 os.path.join(output_folder, f"{grd_prefix}rms_single.grd"),
                 X_topo, Y_topo, rms_const,
             )
+            # Also create simple Te/RMS map images for the single-window result (full grid, constant values)
+            extent_km_full = [xmin_km, xmax_km, ymin_km, ymax_km]
+            from matplotlib.ticker import FuncFormatter as _FmtKm
+            def _fmt_km(v, t): return f"{int(v)}"
+
+            # Te map (km)
+            fig_te_full, ax_te_full = plt.subplots(1, 1, figsize=(10, 8))
+            im_te_full = ax_te_full.imshow(
+                Te_const / 1000.0,
+                extent=extent_km_full,
+                cmap="jet",
+                origin="lower",
+                aspect="equal",
+            )
+            ax_te_full.set_title("Elastic thickness (single-window result)")
+            ax_te_full.set_xlabel("X (km)")
+            ax_te_full.set_ylabel("Y (km)")
+            ax_te_full.xaxis.set_major_formatter(_FmtKm(_fmt_km))
+            ax_te_full.yaxis.set_major_formatter(_FmtKm(_fmt_km))
+            plt.colorbar(im_te_full, ax=ax_te_full, label="Te (km)")
+            te_full_path = os.path.join(output_folder, f"{grd_prefix}Te_single_map.png")
+            fig_te_full.savefig(te_full_path, dpi=300, bbox_inches="tight")
+            plt.close(fig_te_full)
+            print(f" Te map (single window): {te_full_path}")
+
+            # RMS map (km)
+            fig_rms_full, ax_rms_full = plt.subplots(1, 1, figsize=(10, 8))
+            rms_plot_full = np.abs(rms_const) / 1000.0
+            im_rms_full = ax_rms_full.imshow(
+                rms_plot_full,
+                extent=extent_km_full,
+                cmap="RdYlGn_r",
+                origin="lower",
+                aspect="equal",
+            )
+            ax_rms_full.set_title("RMS misfit (single-window result)")
+            ax_rms_full.set_xlabel("X (km)")
+            ax_rms_full.set_ylabel("Y (km)")
+            ax_rms_full.xaxis.set_major_formatter(_FmtKm(_fmt_km))
+            ax_rms_full.yaxis.set_major_formatter(_FmtKm(_fmt_km))
+            plt.colorbar(im_rms_full, ax=ax_rms_full, label="RMS misfit (km)")
+            rms_full_path = os.path.join(output_folder, f"{grd_prefix}rms_single_map.png")
+            fig_rms_full.savefig(rms_full_path, dpi=300, bbox_inches="tight")
+            plt.close(fig_rms_full)
+            print(f" RMS map (single window): {rms_full_path}")
         print(" Surfer .grd files saved.")
 
         # Single-window FIGURES (PNG)
@@ -1036,8 +1066,7 @@ def main():
         else:
             print("\n Performing moving window analysis using observed Moho")
             print("  (Will estimate Te by comparing observed vs flexure-predicted Moho)")
-        print("\n") 
-        print(" MOVING WINDOW ANALYSIS")
+        print("\nMoving-window analysis.")
          
 
         try:
@@ -1091,8 +1120,7 @@ def main():
         )
 
         # CREATE TE MAPS FOR EACH SHIFT
-        print("\n") 
-        print(" CREATING TE MAPS")
+        print("\nCreating Te maps.")
          
 
         from matplotlib.ticker import FuncFormatter
@@ -1414,8 +1442,7 @@ def main():
             )
         
         # CREATE RMS MAPS FOR EACH SHIFT
-        print("\n") 
-        print(" CREATING RMS MAPS")
+        print("\nCreating RMS maps.")
          
         
         # Create RMS map figures for each shift distance
@@ -1431,8 +1458,7 @@ def main():
             )
 
         # SAVE DATA
-        print("\n") 
-        print(" SAVING DATA")
+        print("\nSaving outputs.")
          
 
         save_dict = {
@@ -1562,8 +1588,7 @@ def main():
 
     # PLOT FINAL RESULTS
     # Plot results whether or not moving window was performed
-    print("\n") 
-    print(" PLOTTING FINAL RESULTS")
+    print("\nPlotting final results.")
      
     
     plot_final_results(
@@ -1580,44 +1605,8 @@ def main():
         filename_prefix=filename_prefix,
     )
 
-    print(f"\n Results saved to: {output_folder}")
-    print("  - inversion_results.npz")
-    if analysis_mode == "single" and single_window_result is not None:
-        print("  - Surfer .grd: topography, topography_anomaly, moho_depth, moho_undulation, Te_single, rms_single")
-        print(f"  - Single-window: Te = {single_window_result['Te_best']/1000:.2f} km, RMS = {single_window_result['rms_best']:.2f} m")
-    else:
-        print("  - Surfer .grd: topography, topography_anomaly, moho_depth, moho_undulation" + (
-              " (+ Te/rms maps per shift)" if perform_mw == "y" and mw_results_dict else ""
-        ))
-    # OUTPUT FIGURES (all saved in output_folder or output_folder/3D)
-    print("\n OUTPUT FIGURES (saved as PNG):")
-    input_data_png = os.path.join(output_folder, f"{filename_prefix}input_data.png" if filename_prefix else "input_data.png")
-    print(f"  - {input_data_png}")
-    if analysis_mode == "single" and single_window_result is not None:
-        grd_pre = filename_prefix if filename_prefix else ""
-        print(f"  - {os.path.join(output_folder, f'{grd_pre}single_window_location.png')}")
-        if single_window_result.get("mode") == "map":
-            print(f"  - {os.path.join(output_folder, f'{grd_pre}single_region_Te_map.png')}")
-            print(f"  - {os.path.join(output_folder, f'{grd_pre}single_region_rms_map.png')}")
-        else:
-            print(f"  - {os.path.join(output_folder, f'{grd_pre}single_window_result.png')}")
-    print(f"  - {os.path.join(output_folder, '3D')}  (3D topography+Moho)")
-    if perform_mw == "y" and mw_results_dict:
-        for shift_dist in mw_results_dict.keys():
-            shift_km = int(shift_dist / 1000)
-            print(f"  - {os.path.join(output_folder, f'{filename_prefix}te_map_shift_{shift_km}km.png')}")
-            print(f"  - {os.path.join(output_folder, f'{filename_prefix}rms_map_shift_{shift_km}km.png')}")
-            print(f"  - {os.path.join(output_folder, '3D', f'{filename_prefix}te_map_shift_{shift_km}km_3d.png')}")
-            print(f"  - {os.path.join(output_folder, '3D', f'{filename_prefix}rms_map_shift_{shift_km}km_3d.png')}")
-    if perform_global == "y" and "fig_sens" in locals():
-        print(f"  - {os.path.join(output_folder, f'{filename_prefix}sensitivity_analysis.png' if filename_prefix else 'sensitivity_analysis.png')}")
+    print(f"\nAnalysis complete. All outputs saved in: {output_folder}")
 
-    # COMPLETION
-    print("\n") 
-    print(" ANALYSIS COMPLETE")
-     
-    print(f"\nAll outputs saved in: {output_folder}")
-    
     # Close terminal logging and restore stdout
     if 'tee' in locals():
         tee.close()
