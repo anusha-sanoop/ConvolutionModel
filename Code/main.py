@@ -1125,6 +1125,28 @@ def main():
             Te_range=(Te_min, Te_max),
         )
 
+        # Trim border cells where Te/RMS are less reliable (window near data edge)
+        TRIM_BORDER_CELLS = 5
+        def trim_te_result(res, trim):
+            if trim <= 0:
+                return res
+            Te = res["Te_map"]
+            ny, nx = Te.shape
+            if 2 * trim >= ny or 2 * trim >= nx:
+                return res
+            out = dict(res)
+            out["Te_map"] = res["Te_map"][trim:-trim, trim:-trim].copy()
+            out["rms_map"] = res["rms_map"][trim:-trim, trim:-trim].copy()
+            out["x_centers"] = res["x_centers"][trim:-trim].copy()
+            out["y_centers"] = res["y_centers"][trim:-trim].copy()
+            return out
+
+        mw_results_trimmed = {
+            shift_dist: trim_te_result(res, TRIM_BORDER_CELLS)
+            for shift_dist, res in mw_results_dict.items()
+        }
+        print(f"  Trimmed {TRIM_BORDER_CELLS} border cells from each side of Te/RMS maps (edge estimates excluded).")
+
         # CREATE TE MAPS FOR EACH SHIFT
         print("\nCreating Te maps.")
          
@@ -1284,16 +1306,16 @@ def main():
             output_folder,
             output_folder_3d,
             filename_prefix,
+            rms_vmin=None,
+            rms_vmax=None,
         ):
-            """Create and save an RMS misfit map figure for a given shift distance"""
-            # 2D figure
+            """Create and save an RMS misfit map figure for a given shift distance.
+            If rms_vmin/rms_vmax are provided (e.g. from untrimmed map), color scale is fixed for consistency."""
             fig_rms = plt.figure(figsize=(12, 10))
             ax_rms = fig_rms.add_subplot(111)
 
-            # Use a colormap that shows low RMS (good fit) in green and high RMS (poor fit) in red
-            cmap_rms = plt.colormaps.get_cmap("RdYlGn_r")  # Reversed: green=low RMS, red=high RMS
+            cmap_rms = plt.colormaps.get_cmap("RdYlGn_r")
 
-            # Calculate extent in km
             x_centers_m = result["x_centers"] + X_topo[0, 0]
             y_centers_m = result["y_centers"] + Y_topo[0, 0]
             extent_km = [
@@ -1303,17 +1325,18 @@ def main():
                 y_centers_m.max() / 1000,
             ]
 
-            # Prepare RMS data - convert to km for display
-            rms_data = np.abs(result["rms_map"]) / 1000  # Convert m to km, ensure positive
+            rms_data = np.abs(result["rms_map"]) / 1000
             rms_data_valid = rms_data[~np.isnan(rms_data)]
-            if len(rms_data_valid) > 0:
-                vmin_rms = np.nanpercentile(rms_data, 5)  # 5th percentile
-                vmax_rms = np.nanpercentile(rms_data, 95)  # 95th percentile
+            if rms_vmin is not None and rms_vmax is not None:
+                vmin_rms = rms_vmin
+                vmax_rms = rms_vmax
+            elif len(rms_data_valid) > 0:
+                vmin_rms = np.nanpercentile(rms_data, 5)
+                vmax_rms = np.nanpercentile(rms_data, 95)
             else:
                 vmin_rms = 0
                 vmax_rms = 1
 
-            # Plot (NaN values remain NaN, so white = no RMS estimate)
             im_rms = ax_rms.imshow(
                 rms_data,
                 extent=extent_km,
@@ -1341,7 +1364,6 @@ def main():
             )
             cbar_rms.formatter.set_useOffset(False)
 
-            # Add statistics text
             if len(rms_data_valid) > 0:
                 mean_rms = np.nanmean(rms_data)
                 min_rms = np.nanmin(rms_data)
@@ -1361,11 +1383,9 @@ def main():
 
             plt.tight_layout()
 
-            # Ensure output folder exists
             output_folder = os.path.abspath(output_folder)
             os.makedirs(output_folder, exist_ok=True)
             
-            # Save figure with prefix
             base_filename = f"rms_map_shift_{shift_km}km.png"
             filename = f"{filename_prefix}{base_filename}" if filename_prefix else base_filename
             rms_map_path = os.path.join(output_folder, filename)
@@ -1382,9 +1402,8 @@ def main():
                 fig_rms.savefig(rms_map_path, dpi=300, bbox_inches="tight")
                 print(f" Saved (retry): {rms_map_path}")
 
-            plt.close(fig_rms)  # Close to free memory
+            plt.close(fig_rms)
 
-            # 3D RMS map (coordinates in km)
             from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  - needed for 3D plots
             fig_rms_3d = plt.figure(figsize=(12, 10))
             ax_rms_3d = fig_rms_3d.add_subplot(111, projection="3d")
@@ -1415,11 +1434,9 @@ def main():
             fig_rms_3d.colorbar(surf_rms, shrink=0.5, aspect=10, pad=0.1, label="RMS Misfit (km)")
             plt.tight_layout()
 
-            # Ensure 3D output folder exists
             output_folder_3d = os.path.abspath(output_folder_3d)
             os.makedirs(output_folder_3d, exist_ok=True)
             
-            # Save 3D figure with prefix
             base_filename_3d = f"rms_map_shift_{shift_km}km_3d.png"
             filename_3d = f"{filename_prefix}{base_filename_3d}" if filename_prefix else base_filename_3d
             rms_map_3d_path = os.path.join(output_folder_3d, filename_3d)
@@ -1437,8 +1454,7 @@ def main():
 
             plt.close(fig_rms_3d)
 
-        # Create Te map figures for each shift distance
-        for shift_dist, result in mw_results_dict.items():
+        for shift_dist, result in mw_results_trimmed.items():
             create_te_map_figure(
                 result,
                 shift_dist,
@@ -1450,13 +1466,17 @@ def main():
                 output_folder_3d,
                 filename_prefix,
             )
-        
-        # CREATE RMS MAPS FOR EACH SHIFT
+
         print("\nCreating RMS maps.")
-         
-        
-        # Create RMS map figures for each shift distance
-        for shift_dist, result in mw_results_dict.items():
+        for shift_dist, result in mw_results_trimmed.items():
+            res_full = mw_results_dict[shift_dist]
+            rms_full_km = np.abs(res_full["rms_map"]) / 1000.0
+            rms_valid = rms_full_km[~np.isnan(rms_full_km)]
+            if len(rms_valid) > 0:
+                rms_vmin = float(np.nanpercentile(rms_full_km, 5))
+                rms_vmax = float(np.nanpercentile(rms_full_km, 95))
+            else:
+                rms_vmin, rms_vmax = None, None
             create_rms_map_figure(
                 result,
                 shift_dist,
@@ -1465,6 +1485,8 @@ def main():
                 output_folder,
                 output_folder_3d,
                 filename_prefix,
+                rms_vmin=rms_vmin,
+                rms_vmax=rms_vmax,
             )
 
         # SAVE DATA
@@ -1488,7 +1510,7 @@ def main():
                 save_dict["sensitivity_Te_values"] = Te_values
                 save_dict["sensitivity_rms_values"] = rms_values
 
-        for shift_dist, res in mw_results_dict.items():
+        for shift_dist, res in mw_results_trimmed.items():
             km = int(shift_dist / 1000)
             save_dict[f"Te_map_shift_{km}km"] = res["Te_map"]
             save_dict[f"rms_map_shift_{km}km"] = res["rms_map"]
@@ -1527,8 +1549,8 @@ def main():
             moho_undulation,
         )
 
-        # Moving-window Te and RMS maps for each shift (if present)
-        for shift_dist, res in mw_results_dict.items():
+        # Moving-window Te and RMS maps for each shift (trimmed borders)
+        for shift_dist, res in mw_results_trimmed.items():
             shift_km = int(shift_dist / 1000)
 
             # Build coordinate grids for window centers
@@ -1581,8 +1603,8 @@ def main():
             os.path.join(output_folder, f"{grd_prefix}moho_undulation.grd"),
             X_topo, Y_topo, moho_undulation,
         )
-        if perform_mw == "y" and "mw_results_dict" in locals():
-            for shift_dist, res in mw_results_dict.items():
+        if perform_mw == "y" and "mw_results_trimmed" in locals():
+            for shift_dist, res in mw_results_trimmed.items():
                 km = int(shift_dist / 1000)
                 x_abs = res["x_centers"] + X_topo[0, 0]
                 y_abs = res["y_centers"] + Y_topo[0, 0]
