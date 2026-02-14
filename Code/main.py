@@ -84,30 +84,32 @@ def plot_final_results(
     def format_km(value, tick_number):
         return f"{int(value)}"
 
-    # Data-driven color limits so variation is visible (avoid flat single color)
-    tmin, tmax = np.nanmin(topography), np.nanmax(topography)
-    if tmax - tmin < 1:
-        tmin, tmax = tmin - 0.5, tmax + 0.5
-    mmin, mmax = np.nanmin(moho_depth), np.nanmax(moho_depth)
-    if mmax - mmin < 1:
-        mmin, mmax = mmin - 0.5, mmax + 0.5
+    # Data in km for display
+    topo_km = topography / 1000.0
+    moho_km = moho_depth / 1000.0
+    tmin, tmax = np.nanmin(topo_km), np.nanmax(topo_km)
+    if tmax - tmin < 0.001:
+        tmin, tmax = tmin - 0.0005, tmax + 0.0005
+    mmin, mmax = np.nanmin(moho_km), np.nanmax(moho_km)
+    if mmax - mmin < 0.001:
+        mmin, mmax = mmin - 0.0005, mmax + 0.0005
 
-    # Panel 1: Topography
+    # Panel 1: Topography (km)
     im1 = axes[0].imshow(
-        topography, extent=extent_km, cmap="jet", origin="lower", aspect="equal",
+        topo_km, extent=extent_km, cmap="jet", origin="lower", aspect="equal",
         vmin=tmin, vmax=tmax
     )
-    axes[0].set_title("Topography (m)", fontsize=14, fontweight="bold")
+    axes[0].set_title("Topography (km)", fontsize=14, fontweight="bold")
     axes[0].set_xlabel("X (km)", fontsize=12)
     axes[0].set_ylabel("Y (km)", fontsize=12)
     axes[0].xaxis.set_major_formatter(FuncFormatter(format_km))
     axes[0].yaxis.set_major_formatter(FuncFormatter(format_km))
-    plt.colorbar(im1, ax=axes[0], label="Topography (m)")
+    plt.colorbar(im1, ax=axes[0], label="Topography (km)")
 
-    # Panel 2: Moho depth
-    moho_title = "Moho depth (m) [from gravity]" if use_gravity else "Moho depth (m)"
+    # Panel 2: Moho depth (km)
+    moho_title = "Moho depth (km) [from gravity]" if use_gravity else "Moho depth (km)"
     im2 = axes[1].imshow(
-        moho_depth, extent=extent_km, cmap="jet", origin="lower", aspect="equal",
+        moho_km, extent=extent_km, cmap="jet", origin="lower", aspect="equal",
         vmin=mmin, vmax=mmax
     )
     axes[1].set_title(moho_title, fontsize=14, fontweight="bold")
@@ -115,7 +117,7 @@ def plot_final_results(
     axes[1].set_ylabel("Y (km)", fontsize=12)
     axes[1].xaxis.set_major_formatter(FuncFormatter(format_km))
     axes[1].yaxis.set_major_formatter(FuncFormatter(format_km))
-    plt.colorbar(im2, ax=axes[1], label="Moho depth (m)")
+    plt.colorbar(im2, ax=axes[1], label="Moho depth (km)")
 
     plt.tight_layout()
     
@@ -142,10 +144,12 @@ def plot_input_data_3d(
 ):
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  - needed for 3D plots
 
-    # Coordinates in meters
-    x_m = X[0, :]
-    y_m = Y[:, 0]
-    Xg, Yg = np.meshgrid(x_m, y_m)
+    # Coordinates in km for display
+    x_km = X[0, :] / 1000.0
+    y_km = Y[:, 0] / 1000.0
+    Xg, Yg = np.meshgrid(x_km, y_km)
+    topo_anom_km = topo_anom / 1000.0
+    moho_undulation_km = moho_undulation / 1000.0
 
     # Create the combined 3D plot
     fig = plt.figure(figsize=(14, 10))
@@ -156,7 +160,7 @@ def plot_input_data_3d(
     surf_topo = ax.plot_surface(
         Xg,
         Yg,
-        topo_anom,
+        topo_anom_km,
         cmap="gist_earth",
         edgecolor="none",
         alpha=0.8,
@@ -167,7 +171,7 @@ def plot_input_data_3d(
     surf_moho = ax.plot_surface(
         Xg,
         Yg,
-        moho_undulation,
+        moho_undulation_km,
         cmap="RdBu_r",
         edgecolor="none",
         alpha=0.6,
@@ -184,8 +188,8 @@ def plot_input_data_3d(
         linewidth=0,
     )
 
-    moho_mean = np.mean(moho_undulation)
-    z_moho_ref = np.full_like(Xg, moho_mean)
+    moho_mean_km = np.mean(moho_undulation_km)
+    z_moho_ref = np.full_like(Xg, moho_mean_km)
     ax.plot_surface(
         Xg,
         Yg,
@@ -202,12 +206,12 @@ def plot_input_data_3d(
         pad=20,
     )
 
-    ax.set_xlabel("X (m)", fontsize=12)
-    ax.set_ylabel("Y (m)", fontsize=12)
-    ax.set_zlabel("Elevation/Depth (m)", fontsize=12)
+    ax.set_xlabel("X (km)", fontsize=12)
+    ax.set_ylabel("Y (km)", fontsize=12)
+    ax.set_zlabel("Elevation/Depth (km)", fontsize=12)
 
-    z_min = min(moho_undulation.min(), -80000)
-    z_max = max(topo_anom.max(), 20000)
+    z_min = min(moho_undulation_km.min(), -80)
+    z_max = max(topo_anom_km.max(), 20)
     ax.set_zlim(z_min, z_max)
 
     cbar_topo = fig.colorbar(
@@ -218,7 +222,7 @@ def plot_input_data_3d(
         pad=0.05,
         location="left",
     )
-    cbar_topo.set_label("Topography (m)", fontsize=11, rotation=90, labelpad=15)
+    cbar_topo.set_label("Topography (km)", fontsize=11, rotation=90, labelpad=15)
 
     cbar_moho = fig.colorbar(
         surf_moho,
@@ -228,7 +232,7 @@ def plot_input_data_3d(
         pad=0.05,
         location="right",
     )
-    cbar_moho.set_label("Moho Depth (m)", fontsize=11, rotation=90, labelpad=15)
+    cbar_moho.set_label("Moho Depth (km)", fontsize=11, rotation=90, labelpad=15)
 
     plt.tight_layout()
 
@@ -274,7 +278,7 @@ def main():
         try:
             ref_moho_km = float(ref_moho_input)
             ref_moho = ref_moho_km * 1000.0  # Convert km to meters for internal calculations
-            print(f"Reference Moho depth: {ref_moho_km:.1f} km ({ref_moho:.1f} m).")
+            print(f"Reference Moho depth: {ref_moho_km:.1f} km.")
         except:
             ref_moho = None
             ref_moho_km = None
@@ -357,7 +361,7 @@ def main():
         X_moho, Y_moho = X_grav, Y_grav
         
         print("Moho prediction complete.")
-        print(f"  Moho depth range: {moho_depth.min():.1f} to {moho_depth.max():.1f} m")
+        print(f"  Moho depth range: {moho_depth.min()/1000:.1f} to {moho_depth.max()/1000:.1f} km")
     else:
         # Load observed Moho data
         X_moho, Y_moho, moho_depth, *_ = read_surfer_grd(moho_file)
@@ -380,15 +384,15 @@ def main():
             topography, moho_depth, apply_taper_flag=True, taper_alpha=0.1, ref_moho=ref_moho
         )
         if ref_moho_km is not None:
-            print(f"  Using user-provided reference Moho: {ref_moho_km:.1f} km ({ref_moho:.1f} m)")
+            print(f"  Using user-provided reference Moho: {ref_moho_km:.1f} km")
         else:
-            print(f"  Using user-provided reference Moho: {ref_moho:.1f} m")
+            print(f"  Using user-provided reference Moho: {ref_moho/1000:.1f} km")
     else:
         # Use mean as reference (default)
         topo_anom, moho_undulation, stats = prepare_data_for_inversion(
             topography, moho_depth, apply_taper_flag=True, taper_alpha=0.1
         )
-        print(f"  Using mean Moho depth as reference: {stats['moho_mean']:.1f} m")
+        print(f"  Using mean Moho depth as reference: {stats['moho_mean']/1000:.1f} km")
     
     # Create initial filename prefix (will be updated with actual window_size later)
     if ref_moho_km is not None:
@@ -405,12 +409,12 @@ def main():
     print(f"\nFilename prefix: {filename_prefix}")
 
     print("\nData Statistics:")
-    print(f"  Topography mean: {stats['topo_mean']:.1f} m")
-    print(f"  Topography std (original): {stats['topo_std']:.1f} m")
-    print(f"  Topography std (anomaly): {stats['topo_anom_std']:.1f} m")
-    print(f"  Moho mean depth: {stats['moho_mean']:.1f} m")
-    print(f"  Moho std (original): {stats['moho_std']:.1f} m")
-    print(f"  Moho undulation std: {stats['moho_undulation_std']:.1f} m")
+    print(f"  Topography mean: {stats['topo_mean']/1000:.1f} km")
+    print(f"  Topography std (original): {stats['topo_std']/1000:.1f} km")
+    print(f"  Topography std (anomaly): {stats['topo_anom_std']/1000:.1f} km")
+    print(f"  Moho mean depth: {stats['moho_mean']/1000:.1f} km")
+    print(f"  Moho std (original): {stats['moho_std']/1000:.1f} km")
+    print(f"  Moho undulation std: {stats['moho_undulation_std']/1000:.1f} km")
     print(f"  Taper applied: {stats['tapered']}")
 
     # PHYSICAL PARAMETERS
@@ -451,8 +455,8 @@ def main():
     max_topo_val = topo_anom[max_topo_idx]
     moho_at_max_topo = moho_undulation[max_topo_idx]
 
-    print(f"At max |topo| ({max_topo_val:.1f} m):")
-    print(f"  Moho undulation: {moho_at_max_topo:.1f} m")
+    print(f"At max |topo| ({max_topo_val/1000:.1f} km):")
+    print(f"  Moho undulation: {moho_at_max_topo/1000:.1f} km")
 
     if max_topo_val > 0 and moho_at_max_topo > 0:
         print("   Positive topo, Positive Moho deflection")
@@ -498,7 +502,7 @@ def main():
         )
 
         print(f"\nGlobal Te estimate: {global_result['Te_best'] / 1000:.2f} km")
-        print(f"  RMS misfit: {global_result['rms_best']:.2f} m")
+        print(f"  RMS misfit: {global_result['rms_best']/1000:.2f} km")
 
         if true_Te is not None:
             error = abs(global_result["Te_best"] - true_Te) / true_Te * 100
@@ -562,7 +566,7 @@ def main():
             confidence_mask = rms_values <= threshold
             if np.any(confidence_mask):
                 Te_conf = Te_values[confidence_mask]
-                print(f"\n  Confidence interval (RMS ≤ {threshold:.1f} m):")
+                print(f"\n  Confidence interval (RMS ≤ {threshold/1000:.1f} km):")
                 print(
                     f"    Te range: {Te_conf.min() / 1000:.1f} - {Te_conf.max() / 1000:.1f} km"
                 )
@@ -630,15 +634,15 @@ def main():
         fig_sw, axes_sw = plt.subplots(1, 2, figsize=(14, 6))
         extent_km = [xmin_km, xmax_km, ymin_km, ymax_km]
         axes_sw[0].imshow(
-            topography, extent=extent_km, cmap="jet", origin="lower", aspect="equal"
+            topography / 1000.0, extent=extent_km, cmap="jet", origin="lower", aspect="equal"
         )
-        axes_sw[0].set_title("Topography (m)")
+        axes_sw[0].set_title("Topography (km)")
         axes_sw[0].set_xlabel("X (km)")
         axes_sw[0].set_ylabel("Y (km)")
         axes_sw[1].imshow(
-            moho_depth, extent=extent_km, cmap="jet", origin="lower", aspect="equal"
+            moho_depth / 1000.0, extent=extent_km, cmap="jet", origin="lower", aspect="equal"
         )
-        axes_sw[1].set_title("Moho depth (m)")
+        axes_sw[1].set_title("Moho depth (km)")
         axes_sw[1].set_xlabel("X (km)")
         axes_sw[1].set_ylabel("Y (km)")
         fig_sw.suptitle(
@@ -780,7 +784,7 @@ def main():
                     "window_bounds": window_bounds_str,
                     "mode": "map",
                 }
-                print(f"\n Te map within region: mean Te = {te_mean_sw/1000:.2f} km, mean RMS = {rms_mean_sw:.2f} m")
+                print(f"\n Te map within region: mean Te = {te_mean_sw/1000:.2f} km, mean RMS = {rms_mean_sw/1000:.2f} km")
                 single_region_has_map = True
             else:
                 single_region_has_map = False
@@ -828,7 +832,7 @@ def main():
             print(f"\n Single-window result:")
             if np.isfinite(te_best) and te_best > 0:
                 print(f"  Te = {te_best / 1000:.2f} km")
-                print(f"  RMS misfit = {rms_best:.2f} m")
+                print(f"  RMS misfit = {rms_best/1000:.2f} km")
             else:
                 print("  Te = N/A (inversion failed or undefined)")
                 print("  RMS misfit = N/A")
@@ -964,22 +968,24 @@ def main():
         from matplotlib.patches import Rectangle as RectPatch
         extent_km_sw = [xmin_km, xmax_km, ymin_km, ymax_km]
         half_km_sw = window_size_km_sw / 2.0
-        tmin, tmax = np.nanmin(topography), np.nanmax(topography)
-        if tmax - tmin < 1:
-            tmin, tmax = tmin - 0.5, tmax + 0.5
-        mmin, mmax = np.nanmin(moho_depth), np.nanmax(moho_depth)
-        if mmax - mmin < 1:
-            mmin, mmax = mmin - 0.5, mmax + 0.5
+        topo_km_sw = topography / 1000.0
+        moho_km_sw = moho_depth / 1000.0
+        tmin, tmax = np.nanmin(topo_km_sw), np.nanmax(topo_km_sw)
+        if tmax - tmin < 0.001:
+            tmin, tmax = tmin - 0.0005, tmax + 0.0005
+        mmin, mmax = np.nanmin(moho_km_sw), np.nanmax(moho_km_sw)
+        if mmax - mmin < 0.001:
+            mmin, mmax = mmin - 0.0005, mmax + 0.0005
 
         fig_loc, ax_loc = plt.subplots(1, 2, figsize=(14, 6))
-        ax_loc[0].imshow(topography, extent=extent_km_sw, cmap="jet", origin="lower", aspect="equal", vmin=tmin, vmax=tmax)
-        ax_loc[0].set_title("Topography (m)")
+        ax_loc[0].imshow(topo_km_sw, extent=extent_km_sw, cmap="jet", origin="lower", aspect="equal", vmin=tmin, vmax=tmax)
+        ax_loc[0].set_title("Topography (km)")
         ax_loc[0].set_xlabel("X (km)")
         ax_loc[0].set_ylabel("Y (km)")
         rect0 = RectPatch((x_center_km - half_km_sw, y_center_km - half_km_sw), window_size_km_sw, window_size_km_sw, linewidth=2, edgecolor="lime", facecolor="none")
         ax_loc[0].add_patch(rect0)
-        ax_loc[1].imshow(moho_depth, extent=extent_km_sw, cmap="jet", origin="lower", aspect="equal", vmin=mmin, vmax=mmax)
-        ax_loc[1].set_title("Moho depth (m)")
+        ax_loc[1].imshow(moho_km_sw, extent=extent_km_sw, cmap="jet", origin="lower", aspect="equal", vmin=mmin, vmax=mmax)
+        ax_loc[1].set_title("Moho depth (km)")
         ax_loc[1].set_xlabel("X (km)")
         ax_loc[1].set_ylabel("Y (km)")
         rect1 = RectPatch((x_center_km - half_km_sw, y_center_km - half_km_sw), window_size_km_sw, window_size_km_sw, linewidth=2, edgecolor="lime", facecolor="none")
@@ -1047,7 +1053,7 @@ def main():
             else:
                 ax_res.text(0.5, 0.6, "Te = N/A (inversion failed or undefined)", fontsize=12, ha="center", transform=trans)
             if np.isfinite(rms_m):
-                ax_res.text(0.5, 0.32, f"RMS misfit = {rms_m:.2f} m", fontsize=12, ha="center", transform=trans)
+                ax_res.text(0.5, 0.32, f"RMS misfit = {rms_m/1000:.2f} km", fontsize=12, ha="center", transform=trans)
             else:
                 ax_res.text(0.5, 0.32, "RMS misfit = N/A", fontsize=12, ha="center", transform=trans)
             ax_res.text(0.5, 0.12, f"Window: {window_bounds_str}", fontsize=10, ha="center", style="italic", transform=trans)
@@ -1146,17 +1152,17 @@ def main():
 
             cmap_te = plt.colormaps.get_cmap("jet")
 
-            # Calculate extent
+            # Calculate extent in km
             x_centers_m = result["x_centers"] + X_topo[0, 0]
             y_centers_m = result["y_centers"] + Y_topo[0, 0]
-            extent = [
-                x_centers_m.min(),
-                x_centers_m.max(),
-                y_centers_m.min(),
-                y_centers_m.max(),
+            extent_km = [
+                x_centers_m.min() / 1000,
+                x_centers_m.max() / 1000,
+                y_centers_m.min() / 1000,
+                y_centers_m.max() / 1000,
             ]
 
-            # Prepare Te data - fill NaN with minimum
+            # Prepare Te data - fill NaN with minimum (already in km)
             Te_data = result["Te_map"] / 1000
             Te_data_filled = Te_data.copy()
             Te_data_filled[np.isnan(Te_data_filled)] = Te_min / 1000
@@ -1164,7 +1170,7 @@ def main():
             # Plot
             im_te = ax_te.imshow(
                 Te_data_filled,
-                extent=extent,
+                extent=extent_km,
                 cmap=cmap_te,
                 origin="lower",
                 aspect="equal",
@@ -1179,8 +1185,8 @@ def main():
                 fontsize=14,
                 fontweight="bold",
             )
-            ax_te.set_xlabel("X (m)", fontsize=12)
-            ax_te.set_ylabel("Y (m)", fontsize=12)
+            ax_te.set_xlabel("X (km)", fontsize=12)
+            ax_te.set_ylabel("Y (km)", fontsize=12)
             ax_te.xaxis.set_major_formatter(FuncFormatter(format_func))
             ax_te.yaxis.set_major_formatter(FuncFormatter(format_func))
 
@@ -1216,11 +1222,13 @@ def main():
 
             plt.close(fig_te)  # Close to free memory
 
-            # 3D Te map
+            # 3D Te map (coordinates in km)
             fig_te_3d = plt.figure(figsize=(12, 10))
             ax_te_3d = fig_te_3d.add_subplot(111, projection="3d")
 
-            Xg, Yg = np.meshgrid(x_centers_m, y_centers_m)
+            x_centers_km = x_centers_m / 1000.0
+            y_centers_km = y_centers_m / 1000.0
+            Xg, Yg = np.meshgrid(x_centers_km, y_centers_km)
             surf_te = ax_te_3d.plot_surface(
                 Xg,
                 Yg,
@@ -1237,8 +1245,8 @@ def main():
                 fontsize=14,
                 fontweight="bold",
             )
-            ax_te_3d.set_xlabel("X (m)", fontsize=12)
-            ax_te_3d.set_ylabel("Y (m)", fontsize=12)
+            ax_te_3d.set_xlabel("X (km)", fontsize=12)
+            ax_te_3d.set_ylabel("Y (km)", fontsize=12)
             ax_te_3d.set_zlabel("Te (km)", fontsize=12)
 
             fig_te_3d.colorbar(surf_te, shrink=0.5, aspect=10, pad=0.1, label="Te (km)")
@@ -1285,14 +1293,14 @@ def main():
             # Use a colormap that shows low RMS (good fit) in green and high RMS (poor fit) in red
             cmap_rms = plt.colormaps.get_cmap("RdYlGn_r")  # Reversed: green=low RMS, red=high RMS
 
-            # Calculate extent
+            # Calculate extent in km
             x_centers_m = result["x_centers"] + X_topo[0, 0]
             y_centers_m = result["y_centers"] + Y_topo[0, 0]
-            extent = [
-                x_centers_m.min(),
-                x_centers_m.max(),
-                y_centers_m.min(),
-                y_centers_m.max(),
+            extent_km = [
+                x_centers_m.min() / 1000,
+                x_centers_m.max() / 1000,
+                y_centers_m.min() / 1000,
+                y_centers_m.max() / 1000,
             ]
 
             # Prepare RMS data - convert to km for display
@@ -1308,7 +1316,7 @@ def main():
             # Plot (NaN values remain NaN, so white = no RMS estimate)
             im_rms = ax_rms.imshow(
                 rms_data,
-                extent=extent,
+                extent=extent_km,
                 cmap=cmap_rms,
                 origin="lower",
                 aspect="equal",
@@ -1323,8 +1331,8 @@ def main():
                 fontsize=14,
                 fontweight="bold",
             )
-            ax_rms.set_xlabel("X (m)", fontsize=12)
-            ax_rms.set_ylabel("Y (m)", fontsize=12)
+            ax_rms.set_xlabel("X (km)", fontsize=12)
+            ax_rms.set_ylabel("Y (km)", fontsize=12)
             ax_rms.xaxis.set_major_formatter(FuncFormatter(format_func))
             ax_rms.yaxis.set_major_formatter(FuncFormatter(format_func))
 
@@ -1376,12 +1384,14 @@ def main():
 
             plt.close(fig_rms)  # Close to free memory
 
-            # 3D RMS map
+            # 3D RMS map (coordinates in km)
             from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  - needed for 3D plots
             fig_rms_3d = plt.figure(figsize=(12, 10))
             ax_rms_3d = fig_rms_3d.add_subplot(111, projection="3d")
 
-            Xg, Yg = np.meshgrid(x_centers_m, y_centers_m)
+            x_centers_km = x_centers_m / 1000.0
+            y_centers_km = y_centers_m / 1000.0
+            Xg, Yg = np.meshgrid(x_centers_km, y_centers_km)
             surf_rms = ax_rms_3d.plot_surface(
                 Xg,
                 Yg,
@@ -1398,8 +1408,8 @@ def main():
                 fontsize=14,
                 fontweight="bold",
             )
-            ax_rms_3d.set_xlabel("X (m)", fontsize=12)
-            ax_rms_3d.set_ylabel("Y (m)", fontsize=12)
+            ax_rms_3d.set_xlabel("X (km)", fontsize=12)
+            ax_rms_3d.set_ylabel("Y (km)", fontsize=12)
             ax_rms_3d.set_zlabel("RMS Misfit (km)", fontsize=12)
 
             fig_rms_3d.colorbar(surf_rms, shrink=0.5, aspect=10, pad=0.1, label="RMS Misfit (km)")
