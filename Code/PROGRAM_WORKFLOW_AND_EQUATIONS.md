@@ -13,9 +13,9 @@ Braitenberg, C., Ebbing, J., & Götze, H. J. (2002). Inverse modelling of elasti
 
 **Spatial vs frequency domain:** Braitenberg et al. formulate the method in the **spatial domain** (convolution of the load with a flexural Green’s function). This program implements the **same relationship** in the **frequency domain** (convolution theorem: multiplication by the transfer function \(F(k)\) in Fourier space), which is mathematically equivalent and numerically efficient (FFT-based).
 
-**Two analysis modes:**
-- **Single window:** One selected region → one Te (or a Te map within that region).
-- **Moving window:** Many overlapping windows over the full grid → Te map over the whole domain.
+**Analysis flow:** Optional global (full-region) inversion; then user chooses:
+- **Single window (1):** One selected region → one Te, or a Te map within that region. Interactive click to place window.
+- **Moving window (2):** Many overlapping windows over the full grid → Te map and RMS map over the whole domain (with border trimming; see Outputs).
 
 ---
 
@@ -52,9 +52,9 @@ Braitenberg, C., Ebbing, J., & Götze, H. J. (2002). Inverse modelling of elasti
         │
         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  4. CHOOSE ANALYSIS MODE                                                     │
-│     • Press 1 → Single window                                                │
-│     • Press 2 → Moving window                                                │
+│  4. (Optional) Global inversion (y/n); then CHOOSE ANALYSIS MODE              │
+│     • Press 1 → Single window (interactive click to place window)            │
+│     • Press 2 → Moving window (multiple shifts → Te + RMS maps)              │
 └─────────────────────────────────────────────────────────────────────────────┘
         │
         ├─── Single window ────────────────────────────────────────────────────┤
@@ -68,14 +68,16 @@ Braitenberg, C., Ebbing, J., & Götze, H. J. (2002). Inverse modelling of elasti
         └─── Moving window ────────────────────────────────────────────────────┤
              • Set window size, shift range, Te range (km)                      │
              • Run moving window for several shift distances                    │
-             • For each shift: Te map, RMS map → PNG + .grd                     │
+             • Trim border cells from Te/RMS maps (unreliable edges excluded)   │
+             • For each shift: Te map, RMS map → 2D + 3D PNG, .grd              │
+             • RMS color scale fixed from full (untrimmed) map for comparison   │
              • Save: .npz, .grd, PNG figures                                    │
         │
         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  5. FINAL PLOTS & OUTPUTS                                                    │
-│     • Topography + Moho summary figure (input_data.png)                       │
-│     • All outputs in timestamped folder: Output_YYYYMMDD_HHMMSS/              │
+│     • Topography + Moho summary figure (input_data.png); axes and data in km │
+│     • All outputs in timestamped folder: Output_YYYYMMDD_HHMMSS/ and 3D/     │
 └─────────────────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -99,7 +101,7 @@ Grids are read in **Surfer ASCII DSAA** format:
 - Line 5: `zmin zmax`
 - Following lines: data rows (row index = Y from bottom to top in the code convention)
 
-Coordinates and values are in **meters** (topography and Moho depth). Gravity is in **mGal**.
+Coordinates and values in the grid files are in **meters** (topography and Moho depth). Gravity is in **mGal**. All **displayed** outputs (plots, terminal stats, figure labels) use **km**.
 
 ### 3.2 Preparation for inversion
 
@@ -247,15 +249,16 @@ Flexural rigidity: \(D = E\,T_e^3 / [12(1-\nu^2)]\).
 
 ## 9. Outputs
 
-- **Folder:** `Output_YYYYMMDD_HHMMSS/` (and subfolder `3D/` if used).  
+- **Folder:** `Output_YYYYMMDD_HHMMSS/` (and subfolder `3D/` for 3D figures when moving window is used).  
+- **Display units:** All figure labels, colorbars, and printed statistics use **km** (topography, Moho depth, Te, RMS). Internal calculations remain in meters.  
 - **Data:**  
-  - `inversion_results.npz`: arrays (topography, Moho, topo anomaly, Moho undulation, Te map(s), RMS map(s), coordinates, etc.).  
-  - Surfer `.grd`: topography, Moho, anomalies, and (for single or moving window) Te and RMS grids.  
+  - `inversion_results.npz`: arrays (topography, Moho, topo anomaly, Moho undulation, Te map(s), RMS map(s), x/y centers, etc.). Moving-window Te and RMS maps are **trimmed** (border cells removed).  
+  - Surfer `.grd`: topography, Moho, anomalies; and (for single or moving window) Te and RMS grids (trimmed for moving window).  
 - **Figures (PNG):**  
-  - `input_data.png`: topography and Moho (km axes).  
-  - Single window: `single_window_location.png`, and either `single_window_result.png` (one Te) or `single_region_Te_map.png` / `single_region_rms_map.png` (Te map in region).  
-  - Moving window: for each shift, `te_map_shift_XXkm.png`, `rms_map_shift_XXkm.png`, and optional 3D versions.  
-- **Log:** `terminal_output.txt` in the same output folder.
+  - `input_data.png`: topography and Moho in **km** (two panels).  
+  - Single window: `single_window_location.png`; either `Te_single_map.png` / single-window result, or `single_region_Te_map.png` and `single_region_rms_map.png` (if Te map within region).  
+  - Moving window: for each shift, `te_map_shift_XXkm.png`, `rms_map_shift_XXkm.png` in main folder; `te_map_shift_XXkm_3d.png`, `rms_map_shift_XXkm_3d.png` in `3D/`. Te and RMS maps show **trimmed** data; RMS color scale is fixed from the full (untrimmed) map.  
+- **Log:** `terminal_output.txt` in the output folder.
 
 ---
 

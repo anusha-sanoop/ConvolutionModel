@@ -292,7 +292,7 @@ Where:
 │  │  • Moho depth file path (.grd)                             │  │
 │  │  → Will use provided Moho depth                             │  │
 │  └──────────────────────────────────────────────────────────┘  │
-│  • Reference Moho depth (m) [optional, default: mean]           │
+│  • Reference Moho depth (km) [optional, default: mean]           │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
@@ -447,15 +447,37 @@ Where:
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  STEP 9: MOVING WINDOW ANALYSIS                                 │
+│  STEP 9: CHOOSE WINDOW MODE                                     │
 │  ─────────────────────────────────────────────────────────────── │
-│  (Performed for BOTH gravity and observed Moho methods)         │
+│  User input: Press 1 for single window, 2 for moving window      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              │                             │
+              ▼                             ▼
+┌─────────────────────────┐   ┌─────────────────────────────────────┐
+│  SINGLE WINDOW          │   │  MOVING WINDOW                      │
+│  • Window size (km)     │   │  • Window size (km) [default 1000]   │
+│  • Te range (km)        │   │  • Shift range: min, max, step (km)   │
+│  • Interactive map:     │   │  • Te range (km) [default 5-80]     │
+│    move cursor,         │   │  • For each shift: grid of windows   │
+│    left-click to fix    │   │  • Trim border cells from Te/RMS     │
+│  • One Te for region OR │   │  • Te maps + RMS maps (2D and 3D)     │
+│    Te map within region │   │  • RMS color scale from full map     │
+│  • Save: .npz, .grd,    │   │  • Save: te_map_shift_XXkm.png,      │
+│    PNG figures          │   │    rms_map_shift_XXkm.png, .grd      │
+└────────────┬────────────┘   └────────────────┬──────────────────┘
+             │                                   │
+             └──────────────┬────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 9b (moving only): MOVING WINDOW ANALYSIS                   │
+│  ─────────────────────────────────────────────────────────────── │
+│  (Skip if single window was chosen)                             │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │ 9.1: Get User Parameters                                   │   │
-│  │  • Window size (km) [default: 1000 km]                    │   │
-│  │  • Shift range: min, max, step (km) [default: 20-80 km]   │   │
-│  │  • Te search range: min, max (km) [default: 5-80 km]     │   │
+│  │ 9.1: Get User Parameters (already listed above)            │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -538,64 +560,40 @@ Where:
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │ 9.3: Create Te Maps for Each Shift                       │   │
-│  │  • Interpolate Te_map to full grid                        │   │
-│  │  • Create 2D and 3D visualization plots                   │   │
-│  │  • Save: te_map_shift_XXkm.png                            │   │
+│  │ 9.3: Create Te and RMS Maps for Each Shift                │   │
+│  │  • Trim border cells from Te_map and rms_map              │   │
+│  │  • Create 2D and 3D Te plots → te_map_shift_XXkm.png      │   │
+│  │  • Create 2D and 3D RMS plots (scale from full map)       │   │
+│  │    → rms_map_shift_XXkm.png                               │   │
+│  │  • Save .grd for Te and RMS (trimmed)                      │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  STEP 10: CALCULATE RESIDUAL MOHO                               │
+│  STEP 10: PLOT FINAL RESULTS                                    │
 │  ─────────────────────────────────────────────────────────────── │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │ IF GRAVITY METHOD:                                        │   │
-│  │  • Calculate flexure-predicted Moho using mean Te        │   │
-│  │    (from moving window analysis)                          │   │
-│  │  • residual_moho = gravity_moho - flexure_moho            │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │ IF OBSERVED MOHO METHOD:                                  │   │
-│  │  • Calculate flexure-predicted Moho using mean Te        │   │
-│  │    (from moving window analysis)                          │   │
-│  │  • residual_moho = observed_moho - flexure_moho         │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-│  • Mask edge regions (10% of domain) to reduce edge artifacts  │
-│  • residual_moho[edges] = NaN                                  │
+│  Create 1×2 figure (all displayed values in km):                │
+│  ┌──────────────────────┬──────────────────────┐               │
+│  │ Topography (km)      │ Moho depth (km)      │               │
+│  │ [from gravity if     │                      │               │
+│  │  gravity method]     │                      │               │
+│  └──────────────────────┴──────────────────────┘               │
+│  Save as: input_data.png                                        │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  STEP 11: PLOT FINAL RESULTS                                    │
-│  ─────────────────────────────────────────────────────────────── │
-│  Create 2×2 figure (3 panels, 4th hidden):                     │
-│  ┌──────────────┬──────────────┐                               │
-│  │ Topography   │ Moho Depth   │                               │
-│  │   (m)        │    (m)       │                               │
-│  │              │ [from gravity│                               │
-│  │              │  if gravity] │                               │
-│  ├──────────────┼──────────────┤                               │
-│  │ Residual     │ (empty)      │                               │
-│  │ Moho (m)     │              │                               │
-│  └──────────────┴──────────────┘                               │
-│  Save as: input_data.png                                       │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  STEP 12: SAVE RESULTS                                          │
+│  STEP 11: SAVE RESULTS                                          │
 │  ─────────────────────────────────────────────────────────────── │
 │  Save to .npz file:                                            │
-│  • topography, topography_anomaly                              │
-│  • moho_depth, moho_undulation                                  │
-│  • X, Y coordinates                                            │
-│  • Te_map_shift_XXkm (from moving window)                      │
-│  • rms_map_shift_XXkm (from moving window)                     │
-│  • x_centers, y_centers (from moving window)                   │
-│  • Statistics                                                  │
+│  • topography, topography_anomaly, moho_depth, moho_undulation │
+│  • X, Y coordinates; statistics                                │
+│  • (Moving window) Te_map_shift_XXkm, rms_map_shift_XXkm       │
+│    (trimmed), x_centers, y_centers                             │
+│  Surfer .grd: topography, Moho, anomalies; Te and RMS (trimmed)│
+│  Log: terminal_output.txt                                      │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
@@ -678,11 +676,15 @@ Te Map (Elastic Thickness)
 
 ## Output Files
 
-1. **input_data.png**: 2×2 figure with Topography, Moho Depth, Residual Moho (3 panels)
-2. **te_map_shift_XXkm.png**: Te map for each shift distance
-3. **te_map_shift_XXkm_3d.png**: 3D Te visualization
-4. **inversion_results.npz**: All data arrays and results
-5. **3D/**: Folder with 3D visualizations
+All displayed values and figure labels use **km**. Te and RMS maps (moving window) are **trimmed** (border cells excluded).
+
+1. **input_data.png**: 1×2 figure – Topography (km), Moho depth (km)
+2. **te_map_shift_XXkm.png**: Te map for each shift (trimmed); in main output folder
+3. **rms_map_shift_XXkm.png**: RMS misfit map for each shift (trimmed); color scale from full map
+4. **te_map_shift_XXkm_3d.png**, **rms_map_shift_XXkm_3d.png**: 3D versions in **3D/** subfolder
+5. **inversion_results.npz**: All data arrays (Te/RMS maps trimmed for moving window)
+6. **Surfer .grd**: topography, Moho, anomalies; Te and RMS grids (trimmed when moving window)
+7. **terminal_output.txt**: Log of terminal output
 
 ---
 
